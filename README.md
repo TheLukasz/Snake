@@ -1,4 +1,4 @@
 # Snake
 Snake in C
-$ Dependencies
+# Dependencies
 Requires xbgi-365 as graphics.h
