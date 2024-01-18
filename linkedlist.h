@@ -14,7 +14,7 @@ typedef struct _node{
 typedef struct linked_list{
   node* HEAD;
   node* CURRENT;
-  node* BACK;
+  node* TAIL;
 }ll;
 
 /*
@@ -72,8 +72,8 @@ void reverse(ll* list){
     p = tmp;
   }
   tmp = list->HEAD;
-  list->HEAD = list->BACK;
-  list->BACK = tmp;
+  list->HEAD = list->TAIL;
+  list->TAIL = tmp;
 }
 
 void append(ll* list, payload_struct payload){
@@ -81,11 +81,11 @@ void append(ll* list, payload_struct payload){
   new_node->payload = payload;
   if(list->HEAD==NULL){
     list->HEAD = new_node;
-    list->BACK = new_node;
+    list->TAIL = new_node;
     return;
   } 
-  list->BACK->next = new_node;
-  list->BACK = new_node;
+  list->TAIL->next = new_node;
+  list->TAIL = new_node;
   new_node->next = NULL;
 }
 
@@ -106,15 +106,15 @@ void push(ll* list, payload_struct payload){
   new_node->payload = payload;
   new_node->next = list->HEAD;
   list->HEAD = new_node;
-  if(list->BACK == NULL){
-  	list->BACK = new_node;
+  if(list->TAIL == NULL){
+  	list->TAIL = new_node;
   }
 }
 
 ll* new_list(){
   ll* list = (ll*)malloc(sizeof(ll));
   list->HEAD = NULL;
-  list->BACK = NULL;
+  list->TAIL = NULL;
   list->CURRENT = NULL;
   return list;
 }
