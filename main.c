@@ -8,32 +8,31 @@
 #define DOWN 1
 #define RIGHT 2
 #define LEFT 3
+#define SCALE 10
+#define SPEED 10
 
 void draw_grid_sqr(int color,int x,int y,int xres,int yres){
-	//setcolor(color);
-	//rectangle((x-1)*(xres/10),(y-1)*(yres/10),(x-1)*(xres/10)+(xres/10)-1,(y-1)*(yres/10)+(yres/10)-1);
 	setfillstyle(SOLID_FILL,color);
-	//bar((x-1)*(xres/10),(y-1)*(yres/10),(x-1)*(xres/10)+(xres/10)-1,(y-1)*(yres/10)+(yres/10)-1);
-	bar((x-1)*(xres/10)+1,(y-1)*(yres/10)+1,(x-1)*(xres/10)+(xres/10)-2,(y-1)*(yres/10)+(yres/10)-2);
+	bar((x-1)*(xres/SCALE)+1,(y-1)*(yres/SCALE)+1,(x-1)*(xres/SCALE)+(xres/SCALE)-2,(y-1)*(yres/SCALE)+(yres/SCALE)-2);
 }
 
 void move_snake(ll* snake_pos_list,int* direction,int* current_direction){
 	payload_struct tmp_payload;
 	switch (*direction) {
 		case UP:
-				tmp_payload = (payload_struct){snake_pos_list->BACK->payload.x,snake_pos_list->BACK->payload.y-1};
+				tmp_payload = (payload_struct){snake_pos_list->TAIL->payload.x,snake_pos_list->TAIL->payload.y-1};
 				*current_direction = UP;
 			break;
 		case DOWN:
-				tmp_payload = (payload_struct){snake_pos_list->BACK->payload.x,snake_pos_list->BACK->payload.y+1};
+				tmp_payload = (payload_struct){snake_pos_list->TAIL->payload.x,snake_pos_list->TAIL->payload.y+1};
 				*current_direction = DOWN;
 			break;
 		case RIGHT:
-				tmp_payload = (payload_struct){snake_pos_list->BACK->payload.x+1,snake_pos_list->BACK->payload.y};
+				tmp_payload = (payload_struct){snake_pos_list->TAIL->payload.x+1,snake_pos_list->TAIL->payload.y};
 				*current_direction = RIGHT;
 			break;
 		case LEFT:
-				tmp_payload = (payload_struct){snake_pos_list->BACK->payload.x-1,snake_pos_list->BACK->payload.y};
+				tmp_payload = (payload_struct){snake_pos_list->TAIL->payload.x-1,snake_pos_list->TAIL->payload.y};
 				*current_direction = LEFT;
 			break;
 		default:
@@ -44,14 +43,14 @@ void move_snake(ll* snake_pos_list,int* direction,int* current_direction){
 }
 
 int check_snake(ll* snake_pos_list){
-	payload_struct snakehead_cords = snake_pos_list->BACK->payload;
+	payload_struct snakehead_cords = snake_pos_list->TAIL->payload;
 	node* node_p = snake_pos_list->HEAD;
 	payload_struct tmp_payload;
-	if(snakehead_cords.x < 1 || snakehead_cords.x > 10 || snakehead_cords.y < 1 || snakehead_cords.y > 10){
+	if(snakehead_cords.x < 1 || snakehead_cords.x > SCALE || snakehead_cords.y < 1 || snakehead_cords.y > SCALE){
 		printf("Hit Wall\n");
 		return 1;
 	}
-	while(node_p->next != snake_pos_list->BACK){
+	while(node_p->next != snake_pos_list->TAIL){
 		tmp_payload = node_p->payload;
 		if(tmp_payload.x == snakehead_cords.x && tmp_payload.y == snakehead_cords.y){
 			printf("Hit Yourself\n");
@@ -105,9 +104,9 @@ int valid_direction(int current_direction, int direction){
 	}
 }
 
-int keyupdate(int* direction){
+void keyupdate(int* direction){
 	char input;
-	if(kbhit()){
+	if(xkbhit()){
 		input = getch();
 		switch (input) {
 			case 'a':
@@ -139,7 +138,7 @@ int is_in_snake(ll* snake_pos_list,payload_struct cords){
 void set_apple(ll* snake_pos_list, payload_struct* apple){
 	payload_struct test_apple;
 	do{
-	test_apple = (payload_struct){rand()%10+1,rand()%10+1};
+	test_apple = (payload_struct){rand()%SCALE+1,rand()%SCALE+1};
 	}while(is_in_snake(snake_pos_list,test_apple));
 	apple->x = test_apple.x;
 	apple->y = test_apple.y;
@@ -177,8 +176,7 @@ int main (int argc, char *argv[]){
 	uint32_t points = 0;
 	while(1){
 		setactivepage(i%2);cleardevice();
-
-		if(i%20 == 0){
+		if(i%20== 0){
 			if(valid_direction(current_direction,direction)){
 				move_snake(snake_pos_list,&direction,&current_direction);
 			}else{
@@ -188,6 +186,10 @@ int main (int argc, char *argv[]){
 				remove_first(snake_pos_list);
 			}else {
 				points++;
+				if(points == 100){
+					printf("You Win!\n");
+					return 0;
+				}
 			}
 			if(check_snake(snake_pos_list)) return 1;
 		}
@@ -196,6 +198,6 @@ int main (int argc, char *argv[]){
 		sprintf(points_str,"%i",points);
 		outtextxy(1,1,points_str);
 
-		setvisualpage(i%2);i++;delay(10);
+		setvisualpage(i%2);i++;delay(SPEED);
 	}
 }
