@@ -9,8 +9,8 @@
 #define RIGHT 2
 #define LEFT 3
 
-#define SCALE 100
-#define SPEED 0
+#define SCALE 10
+#define SPEED 10
 
 void draw_grid_sqr(int color,int x,int y,int xres,int yres,int scale){
 	setfillstyle(SOLID_FILL,color);
